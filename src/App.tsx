@@ -22,10 +22,14 @@ export function App() {
     resetGame,
   } = useGame();
 
+  const currentTrial = gameState?.trials[gameState.currentTrialIndex] ?? null;
+  const canRespond = gameState?.isRunning && gameState.currentTrialIndex >= settings.nLevel;
+
   useEffect(() => {
     if (phase !== 'playing') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!canRespond) return;
       if (e.key.toLowerCase() === 'f') {
         e.preventDefault();
         respondPosition();
@@ -37,9 +41,7 @@ export function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, respondPosition, respondAudio]);
-
-  const currentTrial = gameState?.trials[gameState.currentTrialIndex] ?? null;
+  }, [phase, respondPosition, respondAudio, canRespond]);
 
   return (
     <div className="app">
@@ -64,7 +66,7 @@ export function App() {
             onAudioMatch={respondAudio}
             positionPressed={currentPositionResponse}
             audioPressed={currentAudioResponse}
-            disabled={!gameState.isRunning}
+            disabled={!canRespond}
           />
 
           <button className="quit-btn" onClick={resetGame}>
