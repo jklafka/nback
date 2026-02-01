@@ -182,6 +182,22 @@ export function useGame() {
 
   useEffect(() => {
     if (gameState?.isRunning && gameState.currentTrialIndex < gameState.trials.length) {
+      // Handle initial delay before first trial (currentTrialIndex === -1)
+      if (gameState.currentTrialIndex === -1) {
+        timerRef.current = window.setTimeout(() => {
+          setGameState((prev) => {
+            if (!prev || !prev.isRunning) return prev;
+            return { ...prev, currentTrialIndex: 0 };
+          });
+        }, settings.intervalMs);
+
+        return () => {
+          if (timerRef.current) {
+            clearTimeout(timerRef.current);
+          }
+        };
+      }
+
       const currentTrial = gameState.trials[gameState.currentTrialIndex];
       if (currentTrial && lastSpokenTrialRef.current !== gameState.currentTrialIndex) {
         lastSpokenTrialRef.current = gameState.currentTrialIndex;
@@ -218,7 +234,7 @@ export function useGame() {
 
     setGameState({
       trials,
-      currentTrialIndex: 0,
+      currentTrialIndex: -1, // Start at -1 for initial delay before first trial
       isRunning: true,
       positionMatches,
       audioMatches,
