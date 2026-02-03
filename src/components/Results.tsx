@@ -37,26 +37,23 @@ interface ResultsProps {
   onStartWithLevel: (nLevel: number) => void;
 }
 
-function getRecommendedLevel(recommendation: Recommendation, nLevel: number): number | null {
+function getRecommendedLevel(recommendation: Recommendation, nLevel: number): number {
   switch (recommendation) {
     case 'increase':
       return nLevel + 1;
     case 'decrease':
       return nLevel - 1;
     case 'stay':
-      return null;
+      return nLevel;
   }
 }
 
 export function Results({ results, nLevel, onRestart, onStartWithLevel }: ResultsProps) {
   const recommendation = getRecommendation(results.positionAccuracy, results.audioAccuracy, nLevel);
   const recommendedLevel = getRecommendedLevel(recommendation, nLevel);
-  const isClickable = recommendedLevel !== null;
 
   const handleRecommendationClick = () => {
-    if (recommendedLevel !== null) {
-      onStartWithLevel(recommendedLevel);
-    }
+    onStartWithLevel(recommendedLevel);
   };
 
   return (
@@ -107,11 +104,11 @@ export function Results({ results, nLevel, onRestart, onStartWithLevel }: Result
       </div>
 
       <div
-        className={`recommendation ${recommendation}${isClickable ? ' clickable' : ''}`}
-        onClick={isClickable ? handleRecommendationClick : undefined}
-        role={isClickable ? 'button' : undefined}
-        tabIndex={isClickable ? 0 : undefined}
-        onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleRecommendationClick(); } : undefined}
+        className={`recommendation ${recommendation} clickable`}
+        onClick={handleRecommendationClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRecommendationClick(); }}
       >
         {getRecommendationText(recommendation, nLevel)}
       </div>
