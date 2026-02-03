@@ -80,8 +80,14 @@ function calculateResults(state: GameState, nLevel: number): GameResults {
   const totalPositionTargets = positionHits + positionMisses;
   const totalAudioTargets = audioHits + audioMisses;
 
-  const positionAccuracy = totalPositionTargets > 0 ? (positionHits / totalPositionTargets) * 100 : 0;
-  const audioAccuracy = totalAudioTargets > 0 ? (audioHits / totalAudioTargets) * 100 : 0;
+  // If no targets existed, accuracy depends on whether user had false alarms
+  // (100% if no false alarms, 0% if any false alarms)
+  const positionAccuracy = totalPositionTargets > 0
+    ? (positionHits / totalPositionTargets) * 100
+    : (positionFalseAlarms === 0 ? 100 : 0);
+  const audioAccuracy = totalAudioTargets > 0
+    ? (audioHits / totalAudioTargets) * 100
+    : (audioFalseAlarms === 0 ? 100 : 0);
 
   return {
     positionHits,
