@@ -1,5 +1,35 @@
 import type { GameResults } from '../types';
 
+type Recommendation = 'increase' | 'decrease' | 'stay';
+
+function getRecommendation(
+  positionAccuracy: number,
+  audioAccuracy: number,
+  nLevel: number
+): Recommendation {
+  // If either score < 75%, recommend decreasing (unless at n=1)
+  if (positionAccuracy < 75 || audioAccuracy < 75) {
+    return nLevel === 1 ? 'stay' : 'decrease';
+  }
+  // If both scores >= 90%, recommend increasing
+  if (positionAccuracy >= 90 && audioAccuracy >= 90) {
+    return 'increase';
+  }
+  // Otherwise, stay at the same level
+  return 'stay';
+}
+
+function getRecommendationText(recommendation: Recommendation, nLevel: number): string {
+  switch (recommendation) {
+    case 'increase':
+      return `Great work! Try ${nLevel + 1}-Back next.`;
+    case 'decrease':
+      return `Consider trying ${nLevel - 1}-Back to build consistency.`;
+    case 'stay':
+      return `Keep practicing at ${nLevel}-Back.`;
+  }
+}
+
 interface ResultsProps {
   results: GameResults;
   nLevel: number;
@@ -52,6 +82,13 @@ export function Results({ results, nLevel, onRestart }: ResultsProps) {
             <span className="stat-value">{results.audioAccuracy.toFixed(0)}%</span>
           </div>
         </div>
+      </div>
+
+      <div className={`recommendation ${getRecommendation(results.positionAccuracy, results.audioAccuracy, nLevel)}`}>
+        {getRecommendationText(
+          getRecommendation(results.positionAccuracy, results.audioAccuracy, nLevel),
+          nLevel
+        )}
       </div>
 
       <button className="start-btn" onClick={onRestart}>
