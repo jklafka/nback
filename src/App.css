@@ -357,6 +357,23 @@ body {
   color: #00d9ff;
 }
 
+.recommendation.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.recommendation.clickable:hover {
+  transform: translateY(-2px);
+}
+
+.recommendation.clickable.increase:hover {
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+}
+
+.recommendation.clickable.decrease:hover {
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+
 @media (max-width: 480px) {
   .grid-cell {
     width: 60px;
