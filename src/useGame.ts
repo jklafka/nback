@@ -247,6 +247,32 @@ export function useGame() {
     setPhase('playing');
   }, [settings]);
 
+  const startGameWithLevel = useCallback((nLevel: number) => {
+    const newSettings = { ...settings, nLevel };
+    setSettings(newSettings);
+
+    const trials = generateTrials(newSettings);
+    const { positionMatches, audioMatches } = computeMatches(trials, nLevel);
+
+    lastSpokenTrialRef.current = -1;
+    positionResponseRef.current = false;
+    audioResponseRef.current = false;
+
+    setGameState({
+      trials,
+      currentTrialIndex: -1,
+      isRunning: true,
+      positionMatches,
+      audioMatches,
+      userPositionResponses: new Array(trials.length).fill(false),
+      userAudioResponses: new Array(trials.length).fill(false),
+    });
+
+    setCurrentPositionResponse(false);
+    setCurrentAudioResponse(false);
+    setPhase('playing');
+  }, [settings]);
+
   const respondPosition = useCallback(() => {
     console.log('respondPosition called');
     positionResponseRef.current = true;
@@ -292,6 +318,7 @@ export function useGame() {
     currentAudioResponse,
     showPosition,
     startGame,
+    startGameWithLevel,
     respondPosition,
     respondAudio,
     resetGame,

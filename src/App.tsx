@@ -17,6 +17,7 @@ export function App() {
     currentAudioResponse,
     showPosition,
     startGame,
+    startGameWithLevel,
     respondPosition,
     respondAudio,
     resetGame,
@@ -80,6 +81,7 @@ export function App() {
           results={results}
           nLevel={settings.nLevel}
           onRestart={resetGame}
+          onStartWithLevel={startGameWithLevel}
         />
       )}
     </div>
