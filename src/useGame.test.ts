@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { generateTrials, computeMatches, calculateResults } from './useGame';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { generateTrials, computeMatches, calculateResults, useGame } from './useGame';
 import type { GameState, Trial } from './types';
 
 const LETTERS = ['C', 'H', 'K', 'L', 'Q', 'R', 'S', 'T'];
@@ -324,5 +325,133 @@ describe('calculateResults', () => {
     expect(results.audioAccuracy).toBe(100);
     expect(results.positionFalseAlarms).toBe(0);
     expect(results.audioFalseAlarms).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// iOS Safari audio unlock tests
+//
+// iOS Safari only allows speechSynthesis.speak() when called within a user
+// gesture. We unlock it by calling speak(emptyUtterance) synchronously inside
+// startGame / startGameWithLevel (both triggered by button clicks). These
+// tests verify that unlock behaviour without advancing fake timers so that
+// the timer-based speakLetter calls don't interfere.
+// ---------------------------------------------------------------------------
+
+describe('useGame iOS Safari audio unlock', () => {
+  const mockCancel = vi.fn();
+  const mockSpeak = vi.fn();
+
+  // jsdom doesn't ship SpeechSynthesisUtterance; provide a minimal stand-in.
+  class MockSpeechSynthesisUtterance {
+    text: string;
+    rate = 1;
+    pitch = 1;
+    constructor(text: string) {
+      this.text = text;
+    }
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockCancel.mockClear();
+    mockSpeak.mockClear();
+
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      value: MockSpeechSynthesisUtterance,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'speechSynthesis', {
+      value: { cancel: mockCancel, speak: mockSpeak },
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('startGame speaks an empty utterance to unlock iOS Safari speech synthesis', () => {
+    const { result } = renderHook(() => useGame());
+
+    act(() => {
+      result.current.startGame();
+    });
+
+    expect(mockSpeak).toHaveBeenCalledTimes(1);
+    const unlockArg = mockSpeak.mock.calls[0]?.[0] as MockSpeechSynthesisUtterance;
+    expect(unlockArg?.text).toBe('');
+    expect(unlockArg?.volume).toBe(0);
+    expect(unlockArg?.rate).toBe(16);
+  });
+
+  it('startGame calls cancel before the unlock speak', () => {
+    const callOrder: string[] = [];
+    mockCancel.mockImplementation(() => callOrder.push('cancel'));
+    mockSpeak.mockImplementation(() => callOrder.push('speak'));
+
+    const { result } = renderHook(() => useGame());
+
+    act(() => {
+      result.current.startGame();
+    });
+
+    expect(callOrder[0]).toBe('cancel');
+    expect(callOrder[1]).toBe('speak');
+  });
+
+  it('startGameWithLevel speaks an empty utterance to unlock iOS Safari speech synthesis', () => {
+    const { result } = renderHook(() => useGame());
+
+    act(() => {
+      result.current.startGameWithLevel(3);
+    });
+
+    expect(mockSpeak).toHaveBeenCalledTimes(1);
+    const unlockArg = mockSpeak.mock.calls[0]?.[0] as MockSpeechSynthesisUtterance;
+    expect(unlockArg?.text).toBe('');
+    expect(unlockArg?.volume).toBe(0);
+    expect(unlockArg?.rate).toBe(16);
+  });
+
+  it('startGameWithLevel calls cancel before the unlock speak', () => {
+    const callOrder: string[] = [];
+    mockCancel.mockImplementation(() => callOrder.push('cancel'));
+    mockSpeak.mockImplementation(() => callOrder.push('speak'));
+
+    const { result } = renderHook(() => useGame());
+
+    act(() => {
+      result.current.startGameWithLevel(3);
+    });
+
+    expect(callOrder[0]).toBe('cancel');
+    expect(callOrder[1]).toBe('speak');
+  });
+
+  it('startGame does not throw when speechSynthesis is unavailable', () => {
+    delete (window as any).speechSynthesis;
+
+    const { result } = renderHook(() => useGame());
+
+    expect(() => {
+      act(() => {
+        result.current.startGame();
+      });
+    }).not.toThrow();
+  });
+
+  it('startGameWithLevel does not throw when speechSynthesis is unavailable', () => {
+    delete (window as any).speechSynthesis;
+
+    const { result } = renderHook(() => useGame());
+
+    expect(() => {
+      act(() => {
+        result.current.startGameWithLevel(2);
+      });
+    }).not.toThrow();
   });
 });
