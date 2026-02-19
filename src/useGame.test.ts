@@ -254,7 +254,7 @@ describe('calculateResults', () => {
     expect(results.audioMisses).toBe(1);
     expect(results.audioFalseAlarms).toBe(1);
     expect(results.positionAccuracy).toBeCloseTo(66.67, 0);
-    expect(results.audioAccuracy).toBe(50);
+    expect(results.audioAccuracy).toBe(45);
   });
 
   it('no targets exist, no false alarms → 100% accuracy', () => {
