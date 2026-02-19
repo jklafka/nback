@@ -131,6 +131,19 @@ export function useGame() {
   // Keep settings ref in sync
   settingsRef.current = settings;
 
+  // iOS Safari only allows speechSynthesis.speak() from within a user gesture.
+  // Calling this function synchronously inside a button-click handler "unlocks"
+  // the API so subsequent programmatic calls (e.g. from setTimeout) also work.
+  const unlockSpeechSynthesis = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const unlock = new SpeechSynthesisUtterance('');
+      unlock.volume = 0;
+      unlock.rate = 16; // finish as fast as possible
+      window.speechSynthesis.speak(unlock);
+    }
+  }, []);
+
   const speakLetter = useCallback((letter: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -234,15 +247,9 @@ export function useGame() {
     }
   }, [gameState?.isRunning, gameState?.currentTrialIndex, settings.intervalMs, speakLetter, advanceTrial, gameState?.trials]);
 
-  const unlockSpeechSynthesis = useCallback(() => {
-    if ('speechSynthesis' in window) {
-      const unlock = new SpeechSynthesisUtterance('');
-      window.speechSynthesis.speak(unlock);
-    }
-  }, []);
-
   const startGame = useCallback(() => {
     unlockSpeechSynthesis();
+
     const trials = generateTrials(settings);
     const { positionMatches, audioMatches } = computeMatches(trials, settings.nLevel);
 
@@ -267,6 +274,7 @@ export function useGame() {
 
   const startGameWithLevel = useCallback((nLevel: number) => {
     unlockSpeechSynthesis();
+
     const newSettings = { ...settings, nLevel };
     setSettings(newSettings);
 
@@ -311,7 +319,9 @@ export function useGame() {
     if (flashTimerRef.current) {
       clearTimeout(flashTimerRef.current);
     }
-    window.speechSynthesis.cancel();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     setGameState(null);
     setResults(null);
     setPhase('settings');
