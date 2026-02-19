@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import type { GameResults } from '../types';
 
 export type Recommendation = 'increase' | 'decrease' | 'stay';
@@ -49,6 +51,21 @@ export function getRecommendedLevel(recommendation: Recommendation, nLevel: numb
 }
 
 export function Results({ results, nLevel, onRestart, onStartWithLevel }: ResultsProps) {
+  const isPerfect = results.positionAccuracy === 100 && results.audioAccuracy === 100;
+
+  useEffect(() => {
+    if (!isPerfect) return;
+    const end = Date.now() + 3000;
+    let rafId: number;
+    const frame = () => {
+      confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+      confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+      if (Date.now() < end) rafId = requestAnimationFrame(frame);
+    };
+    frame();
+    return () => cancelAnimationFrame(rafId);
+  }, [isPerfect]);
+
   const recommendation = getRecommendation(results.positionAccuracy, results.audioAccuracy, nLevel);
   const recommendedLevel = getRecommendedLevel(recommendation, nLevel);
 
