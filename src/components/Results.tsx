@@ -1,8 +1,8 @@
 import type { GameResults } from '../types';
 
-type Recommendation = 'increase' | 'decrease' | 'stay';
+export type Recommendation = 'increase' | 'decrease' | 'stay';
 
-function getRecommendation(
+export function getRecommendation(
   positionAccuracy: number,
   audioAccuracy: number,
   nLevel: number
@@ -19,7 +19,7 @@ function getRecommendation(
   return 'stay';
 }
 
-function getRecommendationText(recommendation: Recommendation, nLevel: number): string {
+export function getRecommendationText(recommendation: Recommendation, nLevel: number): string {
   switch (recommendation) {
     case 'increase':
       return `Great work! Try ${nLevel + 1}-Back next.`;
@@ -37,7 +37,7 @@ interface ResultsProps {
   onStartWithLevel: (nLevel: number) => void;
 }
 
-function getRecommendedLevel(recommendation: Recommendation, nLevel: number): number {
+export function getRecommendedLevel(recommendation: Recommendation, nLevel: number): number {
   switch (recommendation) {
     case 'increase':
       return nLevel + 1;

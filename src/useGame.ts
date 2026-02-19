@@ -4,7 +4,7 @@ import type { GameSettings, Trial, GameState, GameResults, GamePhase } from './t
 const LETTERS = ['C', 'H', 'K', 'L', 'Q', 'R', 'S', 'T'];
 const GRID_SIZE = 9;
 
-function generateTrials(settings: GameSettings): Trial[] {
+export function generateTrials(settings: GameSettings): Trial[] {
   const { nLevel, trialCount } = settings;
   const trials: Trial[] = [];
 
@@ -29,7 +29,7 @@ function generateTrials(settings: GameSettings): Trial[] {
   return trials;
 }
 
-function computeMatches(trials: Trial[], nLevel: number): { positionMatches: boolean[]; audioMatches: boolean[] } {
+export function computeMatches(trials: Trial[], nLevel: number): { positionMatches: boolean[]; audioMatches: boolean[] } {
   const positionMatches: boolean[] = [];
   const audioMatches: boolean[] = [];
 
@@ -48,7 +48,7 @@ function computeMatches(trials: Trial[], nLevel: number): { positionMatches: boo
   return { positionMatches, audioMatches };
 }
 
-function calculateResults(state: GameState, nLevel: number): GameResults {
+export function calculateResults(state: GameState, nLevel: number): GameResults {
   console.log('calculateResults called');
   console.log('positionMatches:', state.positionMatches);
   console.log('audioMatches:', state.audioMatches);
