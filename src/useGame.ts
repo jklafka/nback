@@ -82,12 +82,16 @@ export function calculateResults(state: GameState, nLevel: number): GameResults 
 
   // If no targets existed, accuracy depends on whether user had false alarms
   // (100% if no false alarms, 0% if any false alarms)
-  const positionAccuracy = totalPositionTargets > 0
+  // Each false alarm subtracts 5 points from the final score, clamped at 0.
+  const positionBaseAccuracy = totalPositionTargets > 0
     ? (positionHits / totalPositionTargets) * 100
     : (positionFalseAlarms === 0 ? 100 : 0);
-  const audioAccuracy = totalAudioTargets > 0
+  const positionAccuracy = Math.max(0, positionBaseAccuracy - positionFalseAlarms * 5);
+
+  const audioBaseAccuracy = totalAudioTargets > 0
     ? (audioHits / totalAudioTargets) * 100
     : (audioFalseAlarms === 0 ? 100 : 0);
+  const audioAccuracy = Math.max(0, audioBaseAccuracy - audioFalseAlarms * 5);
 
   return {
     positionHits,
@@ -230,7 +234,15 @@ export function useGame() {
     }
   }, [gameState?.isRunning, gameState?.currentTrialIndex, settings.intervalMs, speakLetter, advanceTrial, gameState?.trials]);
 
+  const unlockSpeechSynthesis = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      const unlock = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(unlock);
+    }
+  }, []);
+
   const startGame = useCallback(() => {
+    unlockSpeechSynthesis();
     const trials = generateTrials(settings);
     const { positionMatches, audioMatches } = computeMatches(trials, settings.nLevel);
 
@@ -251,9 +263,10 @@ export function useGame() {
     setCurrentPositionResponse(false);
     setCurrentAudioResponse(false);
     setPhase('playing');
-  }, [settings]);
+  }, [settings, unlockSpeechSynthesis]);
 
   const startGameWithLevel = useCallback((nLevel: number) => {
+    unlockSpeechSynthesis();
     const newSettings = { ...settings, nLevel };
     setSettings(newSettings);
 
@@ -277,7 +290,7 @@ export function useGame() {
     setCurrentPositionResponse(false);
     setCurrentAudioResponse(false);
     setPhase('playing');
-  }, [settings]);
+  }, [settings, unlockSpeechSynthesis]);
 
   const respondPosition = useCallback(() => {
     console.log('respondPosition called');
