@@ -72,7 +72,7 @@ describe('Settings', () => {
     render(
       <Settings
         {...defaultProps}
-        settings={{ nLevel: 9, trialCount: 50, intervalMs: 5000 }}
+        settings={{ nLevel: 9, trialCount: 100, intervalMs: 5000 }}
       />
     );
 
