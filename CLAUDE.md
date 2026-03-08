@@ -18,7 +18,7 @@ This project uses **bun**. Always use `bun` instead of `node`, `npm`, or `npx`:
 - `bun run dev` — start dev server (localhost:5173)
 - `bun run build` — production build
 - `bun run preview` — preview built app
-- `bun test` — run tests once (preferred)
+- `bun run test` — run tests once (preferred)
 
 ## Project Structure
 
