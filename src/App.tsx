@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useGame } from './useGame';
 import { Grid } from './components/Grid';
 import { Controls } from './components/Controls';
 import { Settings } from './components/Settings';
 import { Results } from './components/Results';
+import type { Theme } from './types';
 import './App.css';
 
 export function App() {
@@ -22,6 +23,19 @@ export function App() {
     respondAudio,
     resetGame,
   } = useGame();
+
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem('theme') as Theme | null) ?? 'cyberpunk'
+  );
+
+  const handleThemeChange = (newTheme: Theme) => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  useEffect(() => {
+    document.body.className = theme === 'cyberpunk' ? '' : `theme-${theme}`;
+  }, [theme]);
 
   const currentTrial = gameState?.trials[gameState.currentTrialIndex] ?? null;
   const canRespond = gameState?.isRunning && gameState.currentTrialIndex >= settings.nLevel;
@@ -51,6 +65,8 @@ export function App() {
           settings={settings}
           onUpdate={updateSettings}
           onStart={startGame}
+          theme={theme}
+          onThemeChange={handleThemeChange}
         />
       )}
 

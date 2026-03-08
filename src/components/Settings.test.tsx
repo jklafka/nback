@@ -15,6 +15,8 @@ describe('Settings', () => {
     settings: defaultSettings,
     onUpdate: vi.fn(),
     onStart: vi.fn(),
+    theme: 'cyberpunk' as const,
+    onThemeChange: vi.fn(),
   };
 
   it('renders all setting controls with values', () => {
@@ -32,7 +34,7 @@ describe('Settings', () => {
 
     // All the + and - buttons
     const buttons = screen.getAllByRole('button');
-    // Buttons: -, +, -, +, -, +, Start Game = 7
+    // Buttons: -, +, -, +, -, +, 4 theme swatches, Start Game = 11
     // Click nLevel +
     const incrementButtons = buttons.filter((b) => b.textContent === '+');
     const decrementButtons = buttons.filter((b) => b.textContent === '-');
