@@ -40,10 +40,10 @@ describe('Settings', () => {
     const decrementButtons = buttons.filter((b) => b.textContent === '-');
 
     await user.click(incrementButtons[0]!); // nLevel +
-    expect(onUpdate).toHaveBeenCalledWith({ nLevel: 3 });
+    expect(onUpdate).toHaveBeenCalledWith({ nLevel: 3, trialCount: 30 });
 
     await user.click(decrementButtons[0]!); // nLevel -
-    expect(onUpdate).toHaveBeenCalledWith({ nLevel: 1 });
+    expect(onUpdate).toHaveBeenCalledWith({ nLevel: 1, trialCount: 10 });
   });
 
   it('start button calls onStart', async () => {

@@ -28,14 +28,14 @@ export function Settings({ settings, onUpdate, onStart, theme, onThemeChange }: 
         <label htmlFor="nLevel">N-Level</label>
         <div className="setting-control">
           <button
-            onClick={() => onUpdate({ nLevel: Math.max(1, settings.nLevel - 1) })}
+            onClick={() => { const n = Math.max(1, settings.nLevel - 1); onUpdate({ nLevel: n, trialCount: n * 10 }); }}
             disabled={settings.nLevel <= 1}
           >
             -
           </button>
           <span id="nLevel" className="setting-value">{settings.nLevel}</span>
           <button
-            onClick={() => onUpdate({ nLevel: Math.min(9, settings.nLevel + 1) })}
+            onClick={() => { const n = Math.min(9, settings.nLevel + 1); onUpdate({ nLevel: n, trialCount: n * 10 }); }}
             disabled={settings.nLevel >= 9}
           >
             +
