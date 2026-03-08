@@ -45,8 +45,8 @@ export function Settings({ settings, onUpdate, onStart }: SettingsProps) {
           </button>
           <span id="trialCount" className="setting-value">{settings.trialCount}</span>
           <button
-            onClick={() => onUpdate({ trialCount: Math.min(50, settings.trialCount + 5) })}
-            disabled={settings.trialCount >= 50}
+            onClick={() => onUpdate({ trialCount: Math.min(100, settings.trialCount + 5) })}
+            disabled={settings.trialCount >= 100}
           >
             +
           </button>
