@@ -275,7 +275,7 @@ export function useGame() {
   const startGameWithLevel = useCallback((nLevel: number) => {
     unlockSpeechSynthesis();
 
-    const newSettings = { ...settings, nLevel };
+    const newSettings = { ...settings, nLevel, trialCount: nLevel * 10 };
     setSettings(newSettings);
 
     const trials = generateTrials(newSettings);
