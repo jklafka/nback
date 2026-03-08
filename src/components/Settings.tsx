@@ -1,12 +1,21 @@
-import type { GameSettings } from '../types';
+import type { GameSettings, Theme } from '../types';
 
 interface SettingsProps {
   settings: GameSettings;
   onUpdate: (settings: Partial<GameSettings>) => void;
   onStart: () => void;
+  theme: Theme;
+  onThemeChange: (theme: Theme) => void;
 }
 
-export function Settings({ settings, onUpdate, onStart }: SettingsProps) {
+const THEMES: { id: Theme; name: string; gradient: string }[] = [
+  { id: 'cyberpunk', name: 'Cyberpunk', gradient: 'linear-gradient(135deg, #00d9ff, #00ff88)' },
+  { id: 'twilight', name: 'Twilight', gradient: 'linear-gradient(135deg, #c084fc, #f472b6)' },
+  { id: 'ember', name: 'Ember', gradient: 'linear-gradient(135deg, #fb923c, #fbbf24)' },
+  { id: 'mono', name: 'Monochrome', gradient: 'linear-gradient(135deg, #e2e8f0, #94a3b8)' },
+];
+
+export function Settings({ settings, onUpdate, onStart, theme, onThemeChange }: SettingsProps) {
   return (
     <div className="settings">
       <h1>Dual N-Back</h1>
@@ -69,6 +78,21 @@ export function Settings({ settings, onUpdate, onStart }: SettingsProps) {
           >
             +
           </button>
+        </div>
+      </div>
+
+      <div className="setting-group">
+        <label>Theme</label>
+        <div className="theme-picker">
+          {THEMES.map(t => (
+            <button
+              key={t.id}
+              className={`theme-swatch${theme === t.id ? ' active' : ''}`}
+              onClick={() => onThemeChange(t.id)}
+              title={t.name}
+              style={{ background: t.gradient }}
+            />
+          ))}
         </div>
       </div>
 

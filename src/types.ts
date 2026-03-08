@@ -31,3 +31,5 @@ export interface GameResults {
 }
 
 export type GamePhase = 'settings' | 'playing' | 'results';
+
+export type Theme = 'cyberpunk' | 'twilight' | 'ember' | 'mono';
