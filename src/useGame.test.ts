@@ -329,6 +329,34 @@ describe('calculateResults', () => {
 });
 
 // ---------------------------------------------------------------------------
+// startGameWithLevel behaviour tests
+// ---------------------------------------------------------------------------
+
+describe('startGameWithLevel', () => {
+  it('sets trialCount to nLevel * 10', () => {
+    const { result } = renderHook(() => useGame());
+
+    act(() => {
+      result.current.startGameWithLevel(3);
+    });
+
+    expect(result.current.settings.nLevel).toBe(3);
+    expect(result.current.settings.trialCount).toBe(30);
+  });
+
+  it('sets trialCount to nLevel * 10 for different levels', () => {
+    const { result } = renderHook(() => useGame());
+
+    act(() => {
+      result.current.startGameWithLevel(5);
+    });
+
+    expect(result.current.settings.nLevel).toBe(5);
+    expect(result.current.settings.trialCount).toBe(50);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // iOS Safari audio unlock tests
 //
 // iOS Safari only allows speechSynthesis.speak() when called within a user
